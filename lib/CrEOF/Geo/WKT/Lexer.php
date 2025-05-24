@@ -84,7 +84,7 @@ class Lexer extends AbstractLexer
      */
     public function value()
     {
-        return $this->token['value'];
+        return $this->token->value;
     }
 
     /**
@@ -95,7 +95,6 @@ class Lexer extends AbstractLexer
     protected function getType(&$value)
     {
         if (is_numeric($value)) {
-            $value += 0;
 
             if (is_int($value)) {
                 return self::T_INTEGER;
