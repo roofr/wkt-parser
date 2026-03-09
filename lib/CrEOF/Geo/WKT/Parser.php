@@ -349,7 +349,7 @@ class Parser
      */
     protected function match($token)
     {
-        $lookaheadType = $this->lexer->lookahead->type;
+        $lookaheadType = $this->lexer->lookahead?->type;
 
         if ($lookaheadType !== $token && ($token !== Lexer::T_TYPE || $lookaheadType <= Lexer::T_TYPE)) {
             throw $this->syntaxError($this->lexer->getLiteral($token));
@@ -372,7 +372,7 @@ class Parser
         $found    = null === $this->lexer->lookahead ? 'end of string.' : sprintf('"%s"', $token->value);
         $message  = sprintf(
             '[Syntax Error] line 0, col %d: Error: %s %s in value "%s"',
-            $token->position ?? '-1',
+            $token?->position ?? '-1',
             $expected,
             $found,
             $this->input

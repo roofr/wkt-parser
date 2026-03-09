@@ -26,6 +26,8 @@ namespace CrEOF\Geo\WKT\Tests;
 use CrEOF\Geo\WKT\Exception\ExceptionInterface;
 use CrEOF\Geo\WKT\Exception\UnexpectedValueException;
 use CrEOF\Geo\WKT\Parser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Basic parser tests
@@ -33,20 +35,16 @@ use CrEOF\Geo\WKT\Parser;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  */
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends TestCase
 {
-    /**
-     * @param string $value
-     * @param array  $expected
-     *
-     * @dataProvider parserTestData
-     */
+    #[DataProvider('parserTestData')]
     public function testParser($value, $expected)
     {
         $parser = new Parser($value);
 
         if ($expected instanceof ExceptionInterface) {
-            $this->setExpectedException(get_class($expected), $expected->getMessage());
+            $this->expectException(get_class($expected));
+            $this->expectExceptionMessage($expected->getMessage());
         }
 
         $actual = $parser->parse();
@@ -58,24 +56,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
 
-        foreach ($this->parserTestData() as $name => $testData) {
+        foreach (static::parserTestData() as $name => $testData) {
             $value    = $testData['value'];
             $expected = $testData['expected'];
 
             if ($expected instanceof ExceptionInterface) {
-                $this->setExpectedException(get_class($expected), $expected->getMessage());
+                try {
+                    $parser->parse($value);
+                    $this->fail(sprintf('Expected exception %s was not thrown for dataset "%s"', get_class($expected), $name));
+                } catch (ExceptionInterface $e) {
+                    $this->assertInstanceOf(get_class($expected), $e, 'Dataset "' . $name . '"');
+                    $this->assertSame($expected->getMessage(), $e->getMessage(), 'Dataset "' . $name . '"');
+                }
+            } else {
+                $actual = $parser->parse($value);
+
+                $this->assertEquals($expected, $actual, 'Failed dataset "' . $name . '"');
             }
-
-            $actual = $parser->parse($value);
-
-            $this->assertEquals($expected, $actual, 'Failed dataset "'. $name . '"');
         }
     }
 
     /**
      * @return array[]
      */
-    public function parserTestData()
+    public static function parserTestData()
     {
         return array(
             'testParsingGarbage' => array(
