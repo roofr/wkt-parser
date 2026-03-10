@@ -24,6 +24,8 @@
 namespace CrEOF\Geo\WKT\Tests;
 
 use CrEOF\Geo\WKT\Lexer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Lexer tests
@@ -31,14 +33,9 @@ use CrEOF\Geo\WKT\Lexer;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  */
-class LexerTest extends \PHPUnit_Framework_TestCase
+class LexerTest extends TestCase
 {
-    /**
-     * @param       $value
-     * @param array $expected
-     *
-     * @dataProvider tokenData
-     */
+    #[DataProvider('tokenData')]
     public function testTokenRecognition($value, array $expected)
     {
         $lexer = new Lexer($value);
@@ -48,9 +45,9 @@ class LexerTest extends \PHPUnit_Framework_TestCase
 
             $actual = $lexer->lookahead;
 
-            $this->assertEquals($token[0], $actual['type']);
-            $this->assertEquals($token[1], $actual['value']);
-            $this->assertEquals($token[2], $actual['position']);
+            $this->assertEquals($token[0], $actual->type);
+            $this->assertEquals($token[1], $actual->value);
+            $this->assertEquals($token[2], $actual->position);
         }
     }
 
@@ -58,7 +55,7 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     {
         $lexer = new Lexer();
 
-        foreach ($this->tokenData() as $name => $testData) {
+        foreach (static::tokenData() as $name => $testData) {
             $lexer->setInput($testData['value']);
 
             foreach ($testData['expected'] as $token) {
@@ -66,9 +63,9 @@ class LexerTest extends \PHPUnit_Framework_TestCase
 
                 $actual = $lexer->lookahead;
 
-                $this->assertEquals($token[0], $actual['type']);
-                $this->assertEquals($token[1], $actual['value']);
-                $this->assertEquals($token[2], $actual['position']);
+                $this->assertEquals($token[0], $actual->type);
+                $this->assertEquals($token[1], $actual->value);
+                $this->assertEquals($token[2], $actual->position);
             }
         }
     }
@@ -76,7 +73,7 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function tokenData()
+    public static function tokenData()
     {
         return array(
             'POINT' => array(
